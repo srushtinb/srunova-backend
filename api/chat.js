@@ -8,25 +8,22 @@ export default async function handler(req, res) {
   try {
     const { message } = req.body;
 
-    if (!message || !message.trim()) {
+    if (!message) {
       return res.status(400).json({ error: "Message is required" });
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.0-pro",
+      model: "gemini-1.5-flash-latest",
     });
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: message }] }],
-    });
-
+    const result = await model.generateContent(message);
     const reply = result.response.text();
 
     res.status(200).json({ reply });
   } catch (error) {
-    console.error("Gemini Error:", error);
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 }
